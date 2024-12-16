@@ -6,8 +6,27 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
+// Cola para almacenar mensajes
+let messageQueue = [];
+
 // Servir archivos HTML
 app.use(express.static(__dirname));
+
+
+// Función para procesar la cola de mensajes
+function processQueue() {
+    if (messageQueue.length > 0) {
+      const message = messageQueue.shift(); // Elimina el primer mensaje de la cola
+      // Enviar el mensaje a todos los clientes conectados
+      wss.clients.forEach((client) => {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(message);
+        }
+      });
+      console.log(`Mensaje enviado: ${message}`);
+    }
+  }
+  
 
 wss.on('connection', (ws) => {
   console.log('Cliente conectado');
@@ -24,6 +43,12 @@ wss.on('connection', (ws) => {
     });
   });
 
+   // Añadir el mensaje a la cola
+   messageQueue.push(text);
+   console.log(`Mensaje añadido a la cola: ${text}`);
+
+   // Procesar la cola para enviar los mensajes
+   processQueue();
   ws.on('close', () => console.log('Cliente desconectado'));
 });
 
