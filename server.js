@@ -27,4 +27,4 @@ wss.on('connection', (ws) => {
   ws.on('close', () => console.log('Cliente desconectado'));
 });
 
-server.listen(3000, () => console.log('Servidor corriendo en http://localhost:3000'));
+server.listen(3000, () => console.log('Servidor corriendo en http://54.224.215.163:3000'));
